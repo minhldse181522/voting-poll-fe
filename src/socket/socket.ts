@@ -1,6 +1,8 @@
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:8080");
+const SOCKET_URL = import.meta.env.VITE_DB_HOST_API;
+
+const socket = io(SOCKET_URL);
 socket.on("connect", () => {
   console.log("Connected to WebSocket server");
 });
