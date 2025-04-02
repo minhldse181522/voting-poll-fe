@@ -3,9 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "../pages/styles/Homepage.module.scss";
 import { getPerformances, votePerformance } from "../services/userService";
-import { Performance } from "../types/Performance";
-import { setPerformances, updateVote } from "../store/slices/performanceSlice";
 import socket from "../socket/socket";
+import { setPerformances, updateVote } from "../store/slices/performanceSlice";
 
 // Danh sách màu sắc khác nhau cho từng performance
 const colors = ["#ff4d4f", "#40a9ff", "#36cfc9", "#ffec3d", "#9254de"];
@@ -15,7 +14,6 @@ const HomePage = () => {
   const performances = useSelector(
     (state: any) => state.performance.performances
   );
-  const [totalVotes, setTotalVotes] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const fetchPerformances = useCallback(async () => {
@@ -23,12 +21,6 @@ const HomePage = () => {
       const res = await getPerformances();
       const data = res.data.data;
       dispatch(setPerformances(data));
-      // Tính tổng số lượng vote
-      const total = data.reduce(
-        (acc: number, p: Performance) => acc + p.vote,
-        0
-      );
-      setTotalVotes(total);
     } catch (error) {
       console.error("Error fetching performances:", error);
     }
@@ -65,12 +57,6 @@ const HomePage = () => {
           : performance
       );
 
-      const newTotalVotes = updatedPerformances.reduce(
-        (acc: number, p: Performance) => acc + p.vote,
-        0
-      );
-      setTotalVotes(newTotalVotes);
-
       // Cập nhật lại các tiết mục trong state
       dispatch(setPerformances(updatedPerformances));
     } catch (error) {
@@ -85,6 +71,10 @@ const HomePage = () => {
       </h1>
       <Row gutter={[16, 16]} style={{ justifyContent: "center" }}>
         {performances.map((performance: any, index: any) => {
+          const totalVotes = performances.reduce(
+            (acc: any, p: any) => acc + p.vote,
+            0
+          );
           // Tính phần trăm vote
           const percentage =
             totalVotes > 0 ? (performance.vote / totalVotes) * 100 : 0;

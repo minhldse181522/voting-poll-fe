@@ -4,9 +4,11 @@ import { lazy } from "react";
 const HomePage = lazy(() => import("../pages/HomePage.tsx"));
 const ConfigPage = lazy(() => import("../pages/ConfigPage.tsx"));
 const VotePage = lazy(() => import("../pages/VotePage.tsx"));
+const LoginPage = lazy(() => import("../pages/LoginPage.tsx"));
 
 const publicRoutes = [
   { path: "/", component: HomePage, private: false },
+  { path: "/login", component: LoginPage, private: false },
   { path: "/config", component: ConfigPage, private: true },
   { path: "/vote", component: VotePage, private: true },
 ];
