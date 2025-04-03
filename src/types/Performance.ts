@@ -3,3 +3,7 @@ export interface Performance {
   name: string;
   vote: number;
 }
+
+export interface UpdatePerformance {
+  categoryId: number;
+}
