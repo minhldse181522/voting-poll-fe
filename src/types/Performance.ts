@@ -7,3 +7,7 @@ export interface Performance {
 export interface UpdatePerformance {
   categoryId: number;
 }
+
+export interface AddPerformance {
+  name: string;
+}
