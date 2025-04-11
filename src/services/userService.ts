@@ -18,7 +18,7 @@ export const getCategories = () => {
 	return api.get("/api/categories");
 };
 
-export const addCategory = (data: AddCategory) => {
+export const addCategory = (data: AddCategory[]) => {
 	return api.post("/api/category", data);
 };
 
@@ -30,7 +30,7 @@ export const deleteCategory = (id: string) => {
 	return api.delete(`/api/category/${id}`);
 };
 
-export const addPerformance = (data: AddPerformance) => {
+export const addPerformance = (data: AddPerformance[]) => {
 	return api.post("/api/performance", data);
 };
 

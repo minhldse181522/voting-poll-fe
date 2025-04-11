@@ -1,8 +1,8 @@
-import { Button, Col, Input, Row, Spin, Steps } from "antd";
+import { Button, Col, Row, Spin, Steps } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import stylesHome from "../pages/styles/Homepage.module.scss";
 import styles from "../pages/styles/ConfigPage.module.scss";
-import { Category } from "../types/Category";
+import { AddCategory, Category } from "../types/Category";
 import {
 	addCategory,
 	addPerformance,
@@ -13,6 +13,14 @@ import { setPerformances } from "../store/slices/performanceSlice";
 import { useDispatch, useSelector } from "react-redux";
 import PerformanceCard from "../components/PerformanceCard";
 import CategoryCard from "../components/CategoryCard";
+import PerformanceInputList from "../components/PerformanceInputList";
+import { AddPerformance } from "../types/Performance";
+import CategoryInput from "../components/CategoryInput";
+
+export interface FormType {
+	categoryList: AddCategory[];
+	performanceList: AddPerformance[];
+}
 
 const ConfigPage = () => {
 	const dispatch = useDispatch();
@@ -24,31 +32,28 @@ const ConfigPage = () => {
 	const [isAdd, setIsAdd] = useState(false);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [categoryId, setCategoryId] = useState<number | null>(null);
-	const [formValue, setFormValue] = useState<any>({
-		categoryName: "",
-		categoryDescription: "",
-		performanceName: "",
+	const [formValue, setFormValue] = useState<FormType>({
+		categoryList: [],
+		performanceList: [],
 	});
 	const [isLoading, setIsLoading] = useState(false);
+	const [performanceList, setPerformanceList] = useState<string[]>([""]);
 
-	const fetchAddCategory = useCallback(async () => {
+	const fetchAddCategoryList = useCallback(async () => {
 		try {
-			await addCategory({
-				categoryName: formValue.categoryName,
-				description: formValue.categoryDescription,
-			});
+			console.log(formValue.categoryList);
+			await addCategory(formValue.categoryList);
 		} catch (error) {
 			console.log("Error adding categories", error);
 		}
 	}, [formValue]);
 
-	const fetchAddPerformance = useCallback(async () => {
+	const fetchAddPerformanceList = useCallback(async () => {
 		try {
-			await addPerformance({
-				name: formValue.performanceName,
-			});
+			console.log(formValue.performanceList);
+			await addPerformance(formValue.performanceList);
 		} catch (error) {
-			console.log("Error adding categories", error);
+			console.log("Error adding performances", error);
 		}
 	}, [formValue]);
 
@@ -215,109 +220,36 @@ const ConfigPage = () => {
 									marginTop: 80,
 								}}
 							>
-								<div>
-									<div style={{ fontWeight: 400 }}>Hạng mục 1</div>
-									<Input
-										placeholder="Nhập tên hạng mục"
-										onChange={(event) =>
-											setFormValue((prev: any) => ({
-												...prev,
-												["categoryName"]: event.currentTarget.value,
-											}))
-										}
-										value={formValue.categoryName}
-										style={{
-											width: "100%",
-											display: "block",
-											margin: "20px 0",
-										}}
-									/>
-									<Input
-										placeholder="Nhập mô tả hạng mục"
-										onChange={(event) =>
-											setFormValue((prev: any) => ({
-												...prev,
-												["categoryDescription"]: event.currentTarget.value,
-											}))
-										}
-										value={formValue.categoryDescription}
-										style={{ width: "100%", display: "block" }}
-									/>
-								</div>
-								<div>
-									<div style={{ fontWeight: 400 }}>Hạng mục 2</div>
-									<Input
-										placeholder="Nhập tên hạng mục"
-										onChange={(event) =>
-											setFormValue((prev: any) => ({
-												...prev,
-												["categoryName"]: event.currentTarget.value,
-											}))
-										}
-										value={formValue.categoryName}
-										style={{
-											width: "100%",
-											display: "block",
-											margin: "20px 0",
-										}}
-									/>
-									<Input
-										placeholder="Nhập mô tả hạng mục"
-										onChange={(event) =>
-											setFormValue((prev: any) => ({
-												...prev,
-												["categoryDescription"]: event.currentTarget.value,
-											}))
-										}
-										value={formValue.categoryDescription}
-										style={{ width: "100%", display: "block" }}
-									/>
-								</div>
-								<div>
-									<div style={{ fontWeight: 400 }}>Hạng mục 3</div>
-									<Input
-										placeholder="Nhập tên hạng mục"
-										onChange={(event) =>
-											setFormValue((prev: any) => ({
-												...prev,
-												["categoryName"]: event.currentTarget.value,
-											}))
-										}
-										value={formValue.categoryName}
-										style={{
-											width: "100%",
-											display: "block",
-											margin: "20px 0",
-										}}
-									/>
-									<Input
-										placeholder="Nhập mô tả hạng mục"
-										onChange={(event) =>
-											setFormValue((prev: any) => ({
-												...prev,
-												["categoryDescription"]: event.currentTarget.value,
-											}))
-										}
-										value={formValue.categoryDescription}
-										style={{ width: "100%", display: "block" }}
-									/>
-								</div>
+								<CategoryInput
+									index={0}
+									formValue={formValue}
+									setFormValue={setFormValue}
+								/>
+								<CategoryInput
+									index={1}
+									formValue={formValue}
+									setFormValue={setFormValue}
+								/>
+								<CategoryInput
+									index={2}
+									formValue={formValue}
+									setFormValue={setFormValue}
+								/>
 							</div>
 						)}
 						{currentStep == 1 && (
-							<>
-								<Input
-									placeholder="Nhập tên tiết mục"
-									onChange={(event) =>
-										setFormValue((prev: any) => ({
-											...prev,
-											["performanceName"]: event.currentTarget.value,
-										}))
-									}
-									value={formValue.performanceName}
-									style={{ width: "30%", display: "block", margin: "20px 0" }}
+							<div style={{ width: "100%", marginTop: "10%" }}>
+								<PerformanceInputList
+									performanceList={performanceList}
+									formValue={formValue}
+									setFormValue={setFormValue}
 								/>
-							</>
+								<Button
+									onClick={() => setPerformanceList((prev) => [...prev, ""])}
+								>
+									+ Thêm tiết mục
+								</Button>
+							</div>
 						)}
 						{currentStep == 2 && (
 							<>
@@ -353,15 +285,8 @@ const ConfigPage = () => {
 								<Button
 									className={stylesHome.buttonCustom}
 									onClick={() => {
-										if (
-											formValue.categoryName &&
-											formValue.categoryDescription
-										) {
-											fetchAddCategory();
-										}
-										if (formValue.performanceName) {
-											fetchAddPerformance();
-										}
+										fetchAddCategoryList();
+										fetchAddPerformanceList();
 									}}
 								>
 									Lưu
