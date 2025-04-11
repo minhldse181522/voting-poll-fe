@@ -47,6 +47,8 @@ const ConfigPage = () => {
 	const [performanceList, setPerformanceList] = useState<string[]>([""]);
 	const [settingsData, setSettingsData] = useState<Settings>();
 
+	console.log("hello world");
+
 	const fetchAddCategoryList = useCallback(async () => {
 		try {
 			formValue.categoryList && (await addCategory(formValue.categoryList));
