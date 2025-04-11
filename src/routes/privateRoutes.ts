@@ -9,7 +9,7 @@ const PrivateRoute = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate("/", { replace: true });
+      navigate("/");
     }
   }, [isAuthenticated, navigate]);
 
