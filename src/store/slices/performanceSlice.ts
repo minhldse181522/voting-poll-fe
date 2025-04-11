@@ -21,9 +21,7 @@ export const performanceSlice = createSlice({
       action: PayloadAction<{ id: string; vote: number }>
     ) => {
       const { id, vote } = action.payload;
-      const performance = state.performances.find(
-        (p) => p.id === id
-      );
+      const performance = state.performances.find((p) => p.id === id);
       if (performance) {
         performance.vote = vote;
       }
