@@ -131,7 +131,7 @@ const HomePage = () => {
                       ? "1px solid #1890ff"
                       : "none",
                   borderRadius: 30,
-                  padding: 10
+                  padding: 10,
                 }}
               >
                 <div style={{ width: "100px", fontWeight: "bold" }}>
