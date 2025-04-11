@@ -11,13 +11,13 @@ import {
   votePerformance,
 } from "../services/userService";
 import socket from "../socket/socket";
-import { setPerformances, updateVote } from "../store/slices/performanceSlice";
-import { logout, selectIsAuthenticated } from "../store/slices/userSlice";
-import { Category } from "../types/Category";
 import {
   selectVotingEnabledByCategory,
+  setCategories,
   setVotingState,
 } from "../store/slices/categorySlice";
+import { setPerformances, updateVote } from "../store/slices/performanceSlice";
+import { logout, selectIsAuthenticated } from "../store/slices/userSlice";
 
 // Danh sách màu sắc khác nhau cho từng performance
 const colors = ["#ff4d4f", "#40a9ff", "#36cfc9", "#ffec3d", "#9254de"];
@@ -30,7 +30,7 @@ const HomePage = () => {
   );
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const categories = useSelector((state: any) => state.category.categories);
   const [categoryId, setCategoryId] = useState<number | null>(null);
 
   const handleLogout = () => {
@@ -41,15 +41,17 @@ const HomePage = () => {
     try {
       const res = await getCategories();
       const data = res.data.data;
-      setCategories(data);
+      dispatch(setCategories(data));
       setCategoryId(data[0].id);
     } catch (error) {
       console.log("Error fetching categories", error);
     }
-  }, []);
+  }, [dispatch]);
 
   const isVotingEnabled = useSelector((state: any) =>
-    selectVotingEnabledByCategory(state, categoryId ?? -1)
+    categoryId
+      ? selectVotingEnabledByCategory(state, categoryId.toString())
+      : false
   );
 
   const fetchPerformances = useCallback(async () => {
@@ -134,11 +136,19 @@ const HomePage = () => {
 
   return (
     <div style={{ padding: "40px" }}>
-      <div className={styles.headerSection}>
-        <h1 style={{ margin: 0, fontSize: "24px" }}>Voting Results</h1>
-        <div>
+      <div>
+        <h1 style={{ margin: 0, fontSize: "24px", textAlign: "center" }}>
+          Voting Results
+        </h1>
+        <div
+          style={{
+            marginBottom: "24px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
           {isAuthenticated ? (
-            <div className={styles.userWelcome}>
+            <div>
               <Button
                 type="primary"
                 onClick={handleVotePermission}
@@ -150,6 +160,18 @@ const HomePage = () => {
                 style={{ marginRight: "10px" }}
               >
                 {isVotingEnabled ? "Stop Voting" : "Enable Voting"}
+              </Button>
+              <Button
+                type="primary"
+                onClick={() => navigate("/config")}
+                className={styles.buttonCustom}
+                style={{
+                  marginRight: "10px",
+                  backgroundColor: "#52c41a",
+                  color: "#fff",
+                }}
+              >
+                Config Page
               </Button>
               <Button
                 type="primary"
