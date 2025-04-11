@@ -1,27 +1,41 @@
-import { Button, Row, Col } from "antd";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Button, Col, Row } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import styles from "../pages/styles/Homepage.module.scss";
 import {
   getCategories,
   getPerformanceByCategory,
+  toggleVotePermit,
   votePerformance,
 } from "../services/userService";
 import socket from "../socket/socket";
 import { setPerformances, updateVote } from "../store/slices/performanceSlice";
+import { logout, selectIsAuthenticated } from "../store/slices/userSlice";
 import { Category } from "../types/Category";
+import {
+  selectVotingEnabledByCategory,
+  setVotingState,
+} from "../store/slices/categorySlice";
 
 // Danh sách màu sắc khác nhau cho từng performance
 const colors = ["#ff4d4f", "#40a9ff", "#36cfc9", "#ffec3d", "#9254de"];
 
 const HomePage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const performances = useSelector(
     (state: any) => state.performance.performances
   );
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryId, setCategoryId] = useState<number | null>(null);
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -33,6 +47,10 @@ const HomePage = () => {
       console.log("Error fetching categories", error);
     }
   }, []);
+
+  const isVotingEnabled = useSelector((state: any) =>
+    selectVotingEnabledByCategory(state, categoryId ?? -1)
+  );
 
   const fetchPerformances = useCallback(async () => {
     if (categoryId === null) return;
@@ -61,8 +79,13 @@ const HomePage = () => {
       dispatch(updateVote(data));
     });
 
+    socket.on("votingStateChanged", (data) => {
+      dispatch(setVotingState(data));
+    });
+
     return () => {
       socket.off("voteUpdate");
+      socket.off("votingStateChanged");
     };
   }, [dispatch]);
 
@@ -71,7 +94,7 @@ const HomePage = () => {
   };
 
   const handleVote = async () => {
-    if (!selectedId) {
+    if (!selectedId || !isVotingEnabled) {
       return;
     }
     try {
@@ -94,13 +117,60 @@ const HomePage = () => {
     }
   };
 
+  const handleVotePermission = async () => {
+    if (!categoryId) return;
+
+    try {
+      const newEnabled = !isVotingEnabled;
+      await toggleVotePermit(categoryId.toString(), { enabled: newEnabled });
+
+      dispatch(
+        setVotingState({ id: categoryId.toString(), enabled: newEnabled })
+      );
+    } catch (error) {
+      console.error("Failed to toggle voting state", error);
+    }
+  };
+
   return (
     <div style={{ padding: "40px" }}>
-      <h1
-        style={{ textAlign: "center", marginBottom: "40px", fontSize: "24px" }}
-      >
-        Voting Results
-      </h1>
+      <div className={styles.headerSection}>
+        <h1 style={{ margin: 0, fontSize: "24px" }}>Voting Results</h1>
+        <div>
+          {isAuthenticated ? (
+            <div className={styles.userWelcome}>
+              <Button
+                type="primary"
+                onClick={handleVotePermission}
+                className={`${styles.buttonCustom} ${
+                  isVotingEnabled
+                    ? styles.stopVotingButton
+                    : styles.enableVotingButton
+                }`}
+                style={{ marginRight: "10px" }}
+              >
+                {isVotingEnabled ? "Stop Voting" : "Enable Voting"}
+              </Button>
+              <Button
+                type="primary"
+                danger
+                onClick={handleLogout}
+                className={styles.buttonCustom}
+              >
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <Button
+              type="primary"
+              onClick={() => navigate("/login")}
+              className={`${styles.buttonCustom} ${styles.loginButton}`}
+            >
+              Login
+            </Button>
+          )}
+        </div>
+      </div>
 
       {/* Phần danh sách tiết mục */}
       <div style={{ maxWidth: "800px", margin: "0 auto" }}>
@@ -216,10 +286,10 @@ const HomePage = () => {
           className={styles.buttonCustom}
           type="primary"
           onClick={handleVote}
-          disabled={!selectedId}
+          disabled={!selectedId || !isVotingEnabled}
           size="large"
         >
-          Vote
+          {!isVotingEnabled ? "Voting is currently disabled" : "Vote"}
         </Button>
       </div>
     </div>

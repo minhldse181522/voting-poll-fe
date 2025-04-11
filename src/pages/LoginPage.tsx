@@ -38,7 +38,7 @@ function LoginPage() {
   return (
     <div className={styles.loginContainer}>
       <div className={styles.loginForm}>
-        <h2>Welcome Back 👋</h2>
+        <h2>Welcome Back</h2>
         <div>Sign in by your business account and manage your projects</div>
         <Form name="basic" onFinish={onFinish} autoComplete="off">
           <Row gutter={[16, 16]} style={{ justifyContent: "center" }}>
@@ -48,7 +48,7 @@ function LoginPage() {
                 rules={[
                   { required: true, message: "Please input your username!" },
                 ]}
-                style={{ marginBottom: -100 }}
+                style={{ marginBottom: -100, width: 300 }}
               >
                 <Input placeholder="Enter your business account" />
               </Form.Item>
