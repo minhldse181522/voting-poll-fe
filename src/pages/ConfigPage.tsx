@@ -49,6 +49,8 @@ const ConfigPage = () => {
 
 	console.log("hello world");
 
+	console.log("hello world 2");
+
 	const fetchAddCategoryList = useCallback(async () => {
 		try {
 			formValue.categoryList && (await addCategory(formValue.categoryList));
