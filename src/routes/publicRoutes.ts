@@ -9,7 +9,7 @@ const LoginPage = lazy(() => import("../pages/LoginPage.tsx"));
 const publicRoutes = [
   { path: "/", component: HomePage, private: false },
   { path: "/login", component: LoginPage, private: false },
-  { path: "/config", component: ConfigPage, private: false },
+  { path: "/config", component: ConfigPage, private: true },
   { path: "/vote", component: VotePage, private: true },
 ];
 

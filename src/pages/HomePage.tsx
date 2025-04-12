@@ -7,6 +7,7 @@ import styles from "../pages/styles/Homepage.module.scss";
 import {
   getCategories,
   getPerformanceByCategory,
+  getSettings,
   toggleVotePermit,
   votePerformance,
 } from "../services/userService";
@@ -18,6 +19,7 @@ import {
 } from "../store/slices/categorySlice";
 import { setPerformances, updateVote } from "../store/slices/performanceSlice";
 import { logout, selectIsAuthenticated } from "../store/slices/userSlice";
+import { Settings } from "../types/Settings";
 
 // Danh sách màu sắc khác nhau cho từng performance
 const colors = ["#ff4d4f", "#40a9ff", "#36cfc9", "#ffec3d", "#9254de"];
@@ -32,10 +34,30 @@ const HomePage = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const categories = useSelector((state: any) => state.category.categories);
   const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [settingsData, setSettingsData] = useState<Settings>();
+  const [backgroundImage, setBackgroundImage] = useState<string>("");
 
   const handleLogout = () => {
     dispatch(logout());
   };
+
+  useEffect(() => {
+    const updateBackground = () => {
+      if (!settingsData) return;
+
+      const isMobile = window.innerWidth <= 768;
+      setBackgroundImage(
+        isMobile ? settingsData.bgPhone : settingsData.bgDesktop
+      );
+    };
+
+    updateBackground(); // Gọi khi settingsData thay đổi
+    window.addEventListener("resize", updateBackground);
+
+    return () => {
+      window.removeEventListener("resize", updateBackground);
+    };
+  }, [settingsData]);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -47,6 +69,19 @@ const HomePage = () => {
       console.log("Error fetching categories", error);
     }
   }, [dispatch]);
+
+  const fetchSettings = useCallback(async () => {
+    try {
+      const res = await getSettings();
+      const data = res.data.data;
+      setSettingsData({
+        bgDesktop: data[data.length - 1].bgDesktop,
+        bgPhone: data[data.length - 1].bgPhone,
+      });
+    } catch (error) {
+      console.log("Error adding performances", error);
+    }
+  }, []);
 
   const isVotingEnabled = useSelector((state: any) =>
     categoryId
@@ -67,7 +102,8 @@ const HomePage = () => {
 
   useEffect(() => {
     fetchCategories();
-  }, [fetchCategories]);
+    fetchSettings();
+  }, [fetchCategories, fetchSettings]);
 
   useEffect(() => {
     if (categoryId !== null) {
@@ -135,7 +171,15 @@ const HomePage = () => {
   };
 
   return (
-    <div style={{ padding: "40px" }}>
+    <div
+      style={{
+        padding: "40px",
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        minHeight: "100vh",
+      }}
+    >
       <div>
         <h1 style={{ margin: 0, fontSize: "24px", textAlign: "center" }}>
           Voting Results
@@ -226,7 +270,13 @@ const HomePage = () => {
                   padding: 10,
                 }}
               >
-                <div style={{ width: "100px", fontWeight: "bold" }}>
+                <div
+                  style={{
+                    width: "100px",
+                    fontWeight: "bold",
+                    color: colors[index % colors.length],
+                  }}
+                >
                   {performance.name}
                 </div>
                 <div
@@ -258,7 +308,7 @@ const HomePage = () => {
                       right: "10px",
                       top: "50%",
                       transform: "translateY(-50%)",
-                      color: percentage > 50 ? "#fff" : "#000",
+                      color: colors[index % colors.length],
                       fontWeight: "bold",
                       zIndex: 1,
                     }}
