@@ -47,6 +47,12 @@ const ConfigPage = () => {
 	const [performanceList, setPerformanceList] = useState<string[]>([""]);
 	const [settingsData, setSettingsData] = useState<Settings>();
 
+	console.log("hello world");
+
+	console.log("hello world 2");
+	console.log("hello world 3");
+	console.log("hello world 4");
+
 	const fetchAddCategoryList = useCallback(async () => {
 		try {
 			formValue.categoryList && (await addCategory(formValue.categoryList));
@@ -340,7 +346,7 @@ const ConfigPage = () => {
 											<Upload
 												className={stylesHome.buttonCustom}
 												customRequest={({ file }) =>
-													handleUpload(file as File, "bgDesktop")
+													handleUpload(file as File, "bgPhone")
 												}
 											>
 												Đổi ảnh
