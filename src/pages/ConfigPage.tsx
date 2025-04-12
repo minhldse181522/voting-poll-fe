@@ -159,7 +159,7 @@ const ConfigPage = () => {
 
 	return (
 		<Spin tip="Loading..." spinning={isLoading}>
-			<div style={{}}>
+			<div>
 				<Button
 					className={stylesHome.buttonCustom}
 					style={{ marginLeft: "1%" }}
@@ -262,7 +262,7 @@ const ConfigPage = () => {
 				)}
 
 				{isAdd && (
-					<div style={{ width: "95%", padding: "0 5%" }}>
+					<div style={{ width: "95%", padding: "0 5%", marginBottom: "20%" }}>
 						<Steps
 							style={{ marginTop: 50 }}
 							current={currentStep}
