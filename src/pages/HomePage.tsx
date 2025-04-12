@@ -24,6 +24,10 @@ import { Settings } from "../types/Settings";
 // Danh sách màu sắc khác nhau cho từng performance
 const colors = ["#ff4d4f", "#40a9ff", "#36cfc9", "#ffec3d", "#9254de"];
 
+const checkIfMobile = () => {
+	return window.innerWidth <= 768;
+};
+
 const HomePage = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
@@ -45,7 +49,7 @@ const HomePage = () => {
 		const updateBackground = () => {
 			if (!settingsData) return;
 
-			const isMobile = window.innerWidth <= 768;
+			const isMobile = checkIfMobile();
 			setBackgroundImage(
 				isMobile ? settingsData.bgPhone : settingsData.bgDesktop,
 			);
@@ -186,6 +190,7 @@ const HomePage = () => {
 				<h1
 					style={{
 						margin: 0,
+						marginBottom: checkIfMobile() ? "8%" : 0,
 						fontSize: "2rem",
 						textAlign: "center",
 						color: settingsData?.textColor,
@@ -193,57 +198,59 @@ const HomePage = () => {
 				>
 					Kết Quả Bình Chọn
 				</h1>
-				<div
-					style={{
-						marginBottom: "24px",
-						display: "flex",
-						justifyContent: "center",
-					}}
-				>
-					{isAuthenticated ? (
-						<div>
+				{!checkIfMobile() && (
+					<div
+						style={{
+							marginBottom: "24px",
+							display: "flex",
+							justifyContent: "center",
+						}}
+					>
+						{isAuthenticated ? (
+							<div>
+								<Button
+									type="primary"
+									onClick={handleVotePermission}
+									className={`${styles.buttonCustom}`}
+									style={{
+										marginRight: "10px",
+										backgroundColor: "#1890ff",
+									}}
+								>
+									{isVotingEnabled ? "Dừng Bình Chọn" : "Mở Bình Chọn"}
+								</Button>
+								<Button
+									type="primary"
+									onClick={() => navigate("/config")}
+									className={styles.buttonCustom}
+									style={{
+										marginRight: "10px",
+										backgroundColor: "#52c41a",
+										color: settingsData?.textColor,
+									}}
+								>
+									Cài Đặt
+								</Button>
+								<Button
+									type="primary"
+									danger
+									onClick={handleLogout}
+									className={styles.buttonCustom}
+								>
+									Đăng Xuất
+								</Button>
+							</div>
+						) : (
 							<Button
 								type="primary"
-								onClick={handleVotePermission}
-								className={`${styles.buttonCustom}`}
-								style={{
-									marginRight: "10px",
-									backgroundColor: "#1890ff",
-								}}
+								onClick={() => navigate("/login")}
+								className={`${styles.buttonCustom} ${styles.loginButton}`}
 							>
-								{isVotingEnabled ? "Dừng Bình Chọn" : "Mở Bình Chọn"}
+								Login
 							</Button>
-							<Button
-								type="primary"
-								onClick={() => navigate("/config")}
-								className={styles.buttonCustom}
-								style={{
-									marginRight: "10px",
-									backgroundColor: "#52c41a",
-									color: settingsData?.textColor,
-								}}
-							>
-								Cài Đặt
-							</Button>
-							<Button
-								type="primary"
-								danger
-								onClick={handleLogout}
-								className={styles.buttonCustom}
-							>
-								Đăng Xuất
-							</Button>
-						</div>
-					) : (
-						<Button
-							type="primary"
-							onClick={() => navigate("/login")}
-							className={`${styles.buttonCustom} ${styles.loginButton}`}
-						>
-							Login
-						</Button>
-					)}
-				</div>
+						)}
+					</div>
+				)}
 			</div>
 
 			{/* Phần danh sách tiết mục */}
@@ -265,11 +272,28 @@ const HomePage = () => {
 						<div
 							key={performance.id}
 							style={{
-								marginBottom: "4%",
+								marginBottom: checkIfMobile() ? "8%" : "4%",
 								cursor: "pointer",
 							}}
 							onClick={() => handleSelect(performance.id)}
 						>
+							{/* mobile performance title*/}
+							{checkIfMobile() && (
+								<div
+									style={{
+										width: "100px",
+										fontWeight: "bold",
+										fontSize: "1.3rem",
+										color: colors[index % colors.length],
+										textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
+										marginLeft: "3%",
+										marginBottom: "3px",
+									}}
+								>
+									{performance.name}
+								</div>
+							)}
+							{/* progress bar */}
 							<div
 								style={{
 									display: "flex",
@@ -288,17 +312,19 @@ const HomePage = () => {
 									padding: 10,
 								}}
 							>
-								<div
-									style={{
-										width: "100px",
-										fontWeight: "bold",
-										fontSize: "1.3rem",
-										color: colors[index % colors.length],
-										marginLeft: "3%",
-									}}
-								>
-									{performance.name}
-								</div>
+								{!checkIfMobile() && (
+									<div
+										style={{
+											width: "100px",
+											fontWeight: "bold",
+											fontSize: "1.3rem",
+											color: colors[index % colors.length],
+											marginLeft: "3%",
+										}}
+									>
+										{performance.name}
+									</div>
+								)}
 								<div
 									style={{
 										flex: 1,
@@ -312,33 +338,44 @@ const HomePage = () => {
 											left: 0,
 											top: 0,
 											height: "100%",
-											width: `${percentage}%`,
+											width: `${percentage - 7}%`,
 											backgroundColor: colors[index % colors.length],
 											borderRadius: "4px",
 											transition: "width 0.3s ease",
 											marginLeft: "5%",
-											// border:
-											// 	selectedId === performance.id
-											// 		? "2px solid #1890ff"
-											// 		: "none",
 										}}
 									/>
-									<span
-										style={{
-											position: "absolute",
-											right: "10px",
-											top: "50%",
-											transform: "translateY(-50%)",
-											color: colors[index % colors.length],
-											fontSize: "1.3rem",
-											fontWeight: "bold",
-											zIndex: 1,
-										}}
-									>
-										{`${Math.round(percentage)}% (${performance.vote} votes)`}
-									</span>
+									{!checkIfMobile() && (
+										<span
+											style={{
+												position: "absolute",
+												right: "10px",
+												top: "50%",
+												transform: "translateY(-50%)",
+												color: colors[index % colors.length],
+												fontSize: checkIfMobile() ? "1rem" : "1.3rem",
+												fontWeight: "bold",
+												zIndex: 1,
+											}}
+										>
+											{`${Math.round(percentage)}% (${performance.vote} phiếu)`}
+										</span>
+									)}
 								</div>
 							</div>
+							{checkIfMobile() && (
+								<span
+									style={{
+										color: colors[index % colors.length],
+										fontSize: checkIfMobile() ? "1rem" : "1.3rem",
+										fontWeight: "bold",
+										textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
+										zIndex: 1,
+									}}
+								>
+									{`${Math.round(percentage)}% (${performance.vote} phiếu)`}
+								</span>
+							)}
 						</div>
 					);
 				})}
@@ -379,7 +416,6 @@ const HomePage = () => {
 				{!isVotingEnabled && (
 					<Alert
 						message={<b>Bình chọn đang được tắt!</b>}
-						description="Ấn nút 'Mở Bình Chọn' để bắt đầu bình chọn"
 						type="info"
 						showIcon
 					/>
@@ -387,7 +423,6 @@ const HomePage = () => {
 				{!selectedId && isVotingEnabled && (
 					<Alert
 						message={<b>Chọn một tiết mục để bình chọn</b>}
-						description="Chọn một trong những tiết mục ở trên để bắt đầu bình chọn"
 						type="info"
 						showIcon
 					/>
