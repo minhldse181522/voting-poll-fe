@@ -1,9 +1,13 @@
 export interface Settings {
-	bgPhone: string;
 	bgDesktop: string;
+	bgPhone: string;
+	textColor: string;
+	buttonColor: string;
 }
 
 export interface AddSettings {
-	bgPhone?: string;
 	bgDesktop: string;
+	bgPhone?: string;
+	textColor?: string;
+	buttonColor?: string;
 }
