@@ -50,6 +50,8 @@ const ConfigPage = () => {
 	console.log("hello world");
 
 	console.log("hello world 2");
+	console.log("hello world 3");
+	console.log("hello world 4");
 
 	const fetchAddCategoryList = useCallback(async () => {
 		try {
@@ -344,7 +346,7 @@ const ConfigPage = () => {
 											<Upload
 												className={stylesHome.buttonCustom}
 												customRequest={({ file }) =>
-													handleUpload(file as File, "bgDesktop")
+													handleUpload(file as File, "bgPhone")
 												}
 											>
 												Đổi ảnh
