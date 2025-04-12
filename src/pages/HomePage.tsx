@@ -208,7 +208,7 @@ const HomePage = () => {
 								className={`${styles.buttonCustom}`}
 								style={{
 									marginRight: "10px",
-									backgroundColor: settingsData?.buttonColor,
+									backgroundColor: "#1890ff",
 								}}
 							>
 								{isVotingEnabled ? "Dừng Bình Chọn" : "Mở Bình Chọn"}
@@ -219,8 +219,7 @@ const HomePage = () => {
 								className={styles.buttonCustom}
 								style={{
 									marginRight: "10px",
-									// backgroundColor: "#52c41a",
-									backgroundColor: settingsData?.buttonColor,
+									backgroundColor: "#52c41a",
 									color: settingsData?.textColor,
 								}}
 							>
@@ -231,9 +230,6 @@ const HomePage = () => {
 								danger
 								onClick={handleLogout}
 								className={styles.buttonCustom}
-								style={{
-									backgroundColor: settingsData?.buttonColor,
-								}}
 							>
 								Đăng Xuất
 							</Button>
@@ -361,9 +357,7 @@ const HomePage = () => {
 							style={{
 								color: category.id === categoryId ? "#fff" : "#000",
 								backgroundColor:
-									category.id === categoryId
-										? settingsData?.buttonColor
-										: "#d9d9d9",
+									category.id === categoryId ? "#1890ff" : "#d9d9d9",
 							}}
 							onClick={() => setCategoryId(category.id)}
 						>
