@@ -34,7 +34,7 @@ export const { setCategories, setVotingState } = categorySlice.actions;
 // Thêm selector này vào categorySlice.ts hoặc file selectors.ts
 export const selectVotingEnabledByCategory = (
   state: any,
-  categoryId: number
+  categoryId: string
 ) => {
   const category = state.category.categories.find(
     (c: any) => c.id === categoryId
