@@ -22,6 +22,7 @@ import { useNavigate } from "react-router";
 import Title from "antd/es/typography/Title";
 import { Settings } from "../types/Settings";
 import { uploadImage } from "../config/cloudinary";
+import { toast } from "react-toastify";
 
 export interface FormType {
 	categoryList: AddCategory[];
@@ -123,10 +124,9 @@ const ConfigPage = () => {
 						: (prev?.bgDesktop ?? ""),
 			}));
 
-			console.log({
-				bgPhone: imgField === "bgPhone" ? result.secure_url : "",
-				bgDesktop: imgField === "bgDesktop" ? result.secure_url : "",
-			});
+			toast.success(
+				`Upload hình nền ${imgField === "bgPhone" ? "điện thoại" : "máy tính"} thành công!`,
+			);
 		} catch (error) {
 			console.error("Error uploading image", error);
 		} finally {
@@ -262,7 +262,7 @@ const ConfigPage = () => {
 				)}
 
 				{isAdd && (
-					<div style={{ width: "95%", padding: "0 5%", marginBottom: "20%" }}>
+					<div style={{ width: "95%", padding: "0 5%", marginBottom: "10%" }}>
 						<Steps
 							style={{ marginTop: 50 }}
 							current={currentStep}
@@ -417,9 +417,14 @@ const ConfigPage = () => {
 									className={stylesHome.buttonCustom}
 									disabled={isLoading}
 									onClick={() => {
-										fetchAddCategoryList();
-										fetchAddPerformanceList();
-										fetchAddSettings();
+										try {
+											fetchAddCategoryList();
+											fetchAddPerformanceList();
+											fetchAddSettings();
+											toast.success("Lưu thông tin thành công!");
+										} catch (error) {
+											console.log("Error while trying to save data");
+										}
 									}}
 								>
 									Lưu
