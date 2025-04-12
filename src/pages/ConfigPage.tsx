@@ -1,4 +1,13 @@
-import { Button, Col, Image, Row, Spin, Steps, Upload } from "antd";
+import {
+	Button,
+	Col,
+	ColorPicker,
+	Image,
+	Row,
+	Spin,
+	Steps,
+	Upload,
+} from "antd";
 import { useCallback, useEffect, useState } from "react";
 import stylesHome from "../pages/styles/Homepage.module.scss";
 import styles from "../pages/styles/ConfigPage.module.scss";
@@ -48,12 +57,6 @@ const ConfigPage = () => {
 	const [performanceList, setPerformanceList] = useState<string[]>([""]);
 	const [settingsData, setSettingsData] = useState<Settings>();
 
-	console.log("hello world");
-
-	console.log("hello world 2");
-	console.log("hello world 3");
-	console.log("hello world 4");
-
 	const fetchAddCategoryList = useCallback(async () => {
 		try {
 			formValue.categoryList && (await addCategory(formValue.categoryList));
@@ -78,6 +81,8 @@ const ConfigPage = () => {
 			setSettingsData({
 				bgDesktop: data[data.length - 1].bgDesktop,
 				bgPhone: data[data.length - 1].bgPhone,
+				textColor: data[data.length - 1].textColor,
+				buttonColor: data[data.length - 1].buttonColor,
 			});
 		} catch (error) {
 			console.log("Error adding performances", error);
@@ -122,6 +127,8 @@ const ConfigPage = () => {
 					imgField === "bgDesktop"
 						? result.secure_url
 						: (prev?.bgDesktop ?? ""),
+				textColor: prev?.textColor ?? "",
+				buttonColor: prev?.buttonColor ?? "",
 			}));
 
 			toast.success(
@@ -323,7 +330,7 @@ const ConfigPage = () => {
 							</div>
 						)}
 						{currentStep == 2 && (
-							<>
+							<div style={{ display: "flex", gap: "10%", marginTop: "3%" }}>
 								<div>
 									<Title level={5} style={{ marginTop: "2%" }}>
 										Hình nền điện thoại
@@ -343,14 +350,16 @@ const ConfigPage = () => {
 									) : (
 										<>
 											<Image width={200} src={settingsData.bgPhone} />
-											<Upload
-												className={stylesHome.buttonCustom}
-												customRequest={({ file }) =>
-													handleUpload(file as File, "bgPhone")
-												}
-											>
-												Đổi ảnh
-											</Upload>
+											<div>
+												<Upload
+													className={stylesHome.buttonCustom}
+													customRequest={({ file }) =>
+														handleUpload(file as File, "bgPhone")
+													}
+												>
+													Đổi ảnh
+												</Upload>
+											</div>
 										</>
 									)}
 								</div>
@@ -373,19 +382,59 @@ const ConfigPage = () => {
 									) : (
 										<>
 											<Image width={200} src={settingsData.bgDesktop} />
-											<Upload
-												className={stylesHome.buttonCustom}
-												customRequest={({ file }) =>
-													handleUpload(file as File, "bgDesktop")
-												}
-												style={{ marginLeft: "1%", display: "block" }}
-											>
-												Đổi ảnh
-											</Upload>
+											<div>
+												<Upload
+													className={stylesHome.buttonCustom}
+													customRequest={({ file }) =>
+														handleUpload(file as File, "bgDesktop")
+													}
+													style={{ marginLeft: "1%", display: "block" }}
+												>
+													Đổi ảnh
+												</Upload>
+											</div>
 										</>
 									)}
 								</div>
-							</>
+								{/* text color input */}
+								<div>
+									<Title level={5} style={{ marginTop: "2%" }}>
+										Màu chữ
+									</Title>
+									<ColorPicker
+										value={settingsData?.textColor}
+										showText
+										size="large"
+										onChange={(value) =>
+											setSettingsData((prev) => ({
+												bgPhone: prev?.bgPhone ?? "",
+												bgDesktop: prev?.bgDesktop ?? "",
+												textColor: value.toHexString(),
+												buttonColor: prev?.buttonColor ?? "",
+											}))
+										}
+									/>
+								</div>
+								{/* text color input */}
+								<div>
+									<Title level={5} style={{ marginTop: "2%" }}>
+										Màu nút bấm
+									</Title>
+									<ColorPicker
+										value={settingsData?.buttonColor}
+										showText
+										size="large"
+										onChange={(value) =>
+											setSettingsData((prev) => ({
+												bgPhone: prev?.bgPhone ?? "",
+												bgDesktop: prev?.bgDesktop ?? "",
+												textColor: prev?.textColor ?? "",
+												buttonColor: value.toHexString(),
+											}))
+										}
+									/>
+								</div>
+							</div>
 						)}
 
 						{/* save button */}
