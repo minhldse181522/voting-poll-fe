@@ -129,14 +129,13 @@ const HomePage = () => {
   useEffect(() => {
     socket.on("vote-success", (message) => {
       console.log(message);
-      // bạn có thể hiển thị toast hoặc alert
     });
 
     socket.on("vote-denied", (message) => {
       toast.warning(message);
     });
 
-    socket.on("vote-updated", (data) => {
+    socket.on("voteUpdate", (data) => {
       dispatch(updateVote(data)); // cập nhật số phiếu vote
     });
 
