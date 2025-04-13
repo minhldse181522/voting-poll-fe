@@ -319,6 +319,7 @@ const HomePage = () => {
 											fontWeight: "bold",
 											fontSize: "1.3rem",
 											color: colors[index % colors.length],
+											textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
 											marginLeft: "3%",
 										}}
 									>
@@ -338,31 +339,27 @@ const HomePage = () => {
 											left: 0,
 											top: 0,
 											height: "100%",
-											width: `${percentage - 7}%`,
+											width: `${percentage}%`,
 											backgroundColor: colors[index % colors.length],
 											borderRadius: "4px",
 											transition: "width 0.3s ease",
-											marginLeft: "5%",
 										}}
 									/>
-									{!checkIfMobile() && (
-										<span
-											style={{
-												position: "absolute",
-												right: "10px",
-												top: "50%",
-												transform: "translateY(-50%)",
-												color: colors[index % colors.length],
-												fontSize: checkIfMobile() ? "1rem" : "1.3rem",
-												fontWeight: "bold",
-												zIndex: 1,
-											}}
-										>
-											{`${Math.round(percentage)}% (${performance.vote} phiếu)`}
-										</span>
-									)}
 								</div>
 							</div>
+							{!checkIfMobile() && (
+								<div
+									style={{
+										color: colors[index % colors.length],
+										fontSize: checkIfMobile() ? "1rem" : "1.3rem",
+										fontWeight: "bold",
+										textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
+										zIndex: 1,
+									}}
+								>
+									{`${Math.round(percentage)}% (${performance.vote} phiếu)`}
+								</div>
+							)}
 							{checkIfMobile() && (
 								<span
 									style={{
