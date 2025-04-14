@@ -3,13 +3,13 @@ import { Alert, Button, Col, Row } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import styles from "../pages/styles/Homepage.module.scss";
 import {
 	getCategories,
 	getPerformanceByCategory,
 	getSettings,
 	toggleVotePermit,
-	votePerformance,
 } from "../services/userService";
 import socket from "../socket/socket";
 import {
@@ -20,6 +20,7 @@ import {
 import { setPerformances, updateVote } from "../store/slices/performanceSlice";
 import { logout, selectIsAuthenticated } from "../store/slices/userSlice";
 import { Settings } from "../types/Settings";
+import { getDeviceId } from "../utils/voteUtils";
 
 // Danh sách màu sắc khác nhau cho từng performance
 const colors = ["#ff4d4f", "#40a9ff", "#36cfc9", "#ffec3d", "#9254de"];
@@ -117,10 +118,25 @@ const HomePage = () => {
 		}
 	}, [categoryId, fetchPerformances]);
 
+	useEffect(() => {
+		const deviceId = getDeviceId(); // bạn đã gọi ở trên đầu rồi
+		if (categoryId) {
+			socket.emit("register", { deviceId, categoryId });
+		}
+	}, [categoryId]);
+
 	// Lắng nghe sự kiện từ WebSocket
 	useEffect(() => {
+		socket.on("vote-success", (message) => {
+			console.log(message);
+		});
+
+		socket.on("vote-denied", (message) => {
+			toast.warning(message);
+		});
+
 		socket.on("voteUpdate", (data) => {
-			dispatch(updateVote(data));
+			dispatch(updateVote(data)); // cập nhật số phiếu vote
 		});
 
 		socket.on("votingStateChanged", (data) => {
@@ -128,7 +144,9 @@ const HomePage = () => {
 		});
 
 		return () => {
-			socket.off("voteUpdate");
+			socket.off("vote-success");
+			socket.off("vote-denied");
+			socket.off("vote-updated");
 			socket.off("votingStateChanged");
 		};
 	}, [dispatch]);
@@ -141,24 +159,10 @@ const HomePage = () => {
 		if (!selectedId || !isVotingEnabled) {
 			return;
 		}
-		try {
-			const payload = {
-				categoryId: categoryId!,
-			};
-			await votePerformance(selectedId, payload);
-
-			// Cập nhật lại tổng số lượng vote
-			const updatedPerformances = performances.map((performance: any) =>
-				performance.id === selectedId
-					? { ...performance, vote: performance.vote + 1 }
-					: performance,
-			);
-
-			// Cập nhật lại các tiết mục trong state
-			dispatch(setPerformances(updatedPerformances));
-		} catch (error) {
-			console.error("Voting failed", error);
-		}
+		socket.emit("vote", {
+			performanceId: selectedId,
+			categoryId: categoryId,
+		});
 	};
 
 	const handleVotePermission = async () => {
@@ -175,6 +179,13 @@ const HomePage = () => {
 			console.error("Failed to toggle voting state", error);
 		}
 	};
+
+	// useEffect(() => {
+	//   document.body.style.overflow = "hidden";
+	//   return () => {
+	//     document.body.style.overflow = "auto";
+	//   };
+	// }, []);
 
 	return (
 		<div
@@ -198,58 +209,57 @@ const HomePage = () => {
 				>
 					Kết Quả Bình Chọn
 				</h1>
-				{!checkIfMobile() && (
-					<div
-						style={{
-							marginBottom: "24px",
-							display: "flex",
-							justifyContent: "center",
-						}}
-					>
-						{isAuthenticated ? (
-							<div>
-								<Button
-									type="primary"
-									onClick={handleVotePermission}
-									className={`${styles.buttonCustom}`}
-									style={{
-										marginRight: "10px",
-										backgroundColor: "#1890ff",
-									}}
-								>
-									{isVotingEnabled ? "Dừng Bình Chọn" : "Mở Bình Chọn"}
-								</Button>
-								<Button
-									type="primary"
-									onClick={() => navigate("/config")}
-									className={styles.buttonCustom}
-									style={{
-										marginRight: "10px",
-										backgroundColor: "#52c41a",
-									}}
-								>
-									Cài Đặt
-								</Button>
-								<Button
-									type="primary"
-									danger
-									onClick={handleLogout}
-									className={styles.buttonCustom}
-								>
-									Đăng Xuất
-								</Button>
-							</div>
-						) : (
+				<div
+					style={{
+						marginBottom: "24px",
+						display: "flex",
+						justifyContent: "center",
+					}}
+				>
+					{isAuthenticated ? (
+						<div>
 							<Button
 								type="primary"
-								onClick={() => navigate("/login")}
-								className={`${styles.buttonCustom} ${styles.loginButton}`}
+								onClick={handleVotePermission}
+								className={`${styles.buttonCustom}`}
+								style={{
+									marginRight: "10px",
+									backgroundColor: "#1890ff",
+								}}
 							>
-								Login
+								{isVotingEnabled ? "Dừng Bình Chọn" : "Mở Bình Chọn"}
 							</Button>
-						)}
-					</div>
-				)}
+							<Button
+								type="primary"
+								onClick={() => navigate("/config")}
+								className={styles.buttonCustom}
+								style={{
+									marginRight: "10px",
+									backgroundColor: "#52c41a",
+									color: settingsData?.textColor,
+								}}
+							>
+								Cài Đặt
+							</Button>
+							<Button
+								type="primary"
+								danger
+								onClick={handleLogout}
+								className={styles.buttonCustom}
+							>
+								Đăng Xuất
+							</Button>
+						</div>
+					) : (
+						<Button
+							type="primary"
+							onClick={() => navigate("/login")}
+							className={`${styles.buttonCustom} ${styles.loginButton}`}
+						>
+							Login
+						</Button>
+					)}
+				</div>
 			</div>
 
 			{/* Phần danh sách tiết mục */}
