@@ -226,7 +226,6 @@ const HomePage = () => {
 									style={{
 										marginRight: "10px",
 										backgroundColor: "#52c41a",
-										color: settingsData?.textColor,
 									}}
 								>
 									Cài Đặt
