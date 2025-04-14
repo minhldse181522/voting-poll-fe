@@ -23,7 +23,8 @@ import { Settings } from "../types/Settings";
 import { getDeviceId } from "../utils/voteUtils";
 
 // Danh sách màu sắc khác nhau cho từng performance
-const colors = ["#ff4d4f", "#40a9ff", "#36cfc9", "#ffec3d", "#9254de"];
+// const colors = ["#ff4d4f", "#40a9ff", "#36cfc9", "#ffec3d", "#9254de"];
+const colors = ["#7A00E6"];
 
 const checkIfMobile = () => {
   return window.innerWidth <= 768;
@@ -236,7 +237,6 @@ const HomePage = () => {
                 style={{
                   marginRight: "10px",
                   backgroundColor: "#52c41a",
-                  color: settingsData?.textColor,
                 }}
               >
                 Cài Đặt
