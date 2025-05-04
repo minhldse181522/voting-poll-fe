@@ -36,7 +36,7 @@ const checkIfMobile = () => {
 const HomePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const performances = useSelector(
     (state: any) => state.performance.performances
   );
@@ -46,6 +46,7 @@ const HomePage = () => {
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [settingsData, setSettingsData] = useState<Settings>();
   const [backgroundImage, setBackgroundImage] = useState<string>("");
+  const [settingId, setSettingId] = useState<string>("");
 
   const handleLogout = () => {
     dispatch(logout());
@@ -69,7 +70,7 @@ const HomePage = () => {
     };
   }, [settingsData]);
 
-  // Lấy danh sách các hang mục
+  // Lấy danh sách các hạng mục
   const fetchCategories = useCallback(async () => {
     try {
       const res = await getCategories();
@@ -92,6 +93,7 @@ const HomePage = () => {
         buttonColor: data[data.length - 1].buttonColor,
         textColor: data[data.length - 1].textColor,
       });
+      setSettingId(data[data.length - 1].id);
     } catch (error) {
       console.log("Error adding performances", error);
     }
@@ -139,6 +141,10 @@ const HomePage = () => {
       console.log(message);
     });
 
+    socket.on("languageUpdate", (data) => {
+      i18n.changeLanguage(data.language);
+    });
+
     socket.on("vote-denied", (message) => {
       toast.warning(message);
     });
@@ -156,8 +162,9 @@ const HomePage = () => {
       socket.off("vote-denied");
       socket.off("vote-updated");
       socket.off("votingStateChanged");
+      socket.off("languageUpdate");
     };
-  }, [dispatch]);
+  }, [i18n, dispatch]);
 
   const handleSelect = (id: string) => {
     setSelectedId((prevSelectedId) => (prevSelectedId === id ? null : id));
@@ -251,7 +258,13 @@ const HomePage = () => {
               >
                 {t("HomePage.logout")}
               </Button>
-              <LanguageSwitch />
+              <LanguageSwitch
+                settingId={settingId}
+                currentLanguage={i18n.language}
+                onLanguageChange={(langCode: string) =>
+                  i18n.changeLanguage(langCode)
+                }
+              />
             </div>
           ) : (
             <Button

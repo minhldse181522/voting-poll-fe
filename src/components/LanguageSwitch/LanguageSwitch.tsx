@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useEffect, useMemo, useState } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
 import ImageVie from "../../assets/Flags.png";
 import ImageEng from "../../assets/FlagsE.png";
+import { updateLanguage } from "../../services/userService";
+import { UpdateLanguage } from "../../types/Settings";
 import "./LanguageSwitch.scss";
 
 interface Language {
@@ -11,8 +12,17 @@ interface Language {
   code: string;
 }
 
-const LanguageSwitch = () => {
-  const { i18n } = useTranslation();
+interface LanguageSwitchProps {
+  settingId: string;
+  currentLanguage: string;
+  onLanguageChange: (langCode: string) => void;
+}
+
+const LanguageSwitch = ({
+  settingId,
+  currentLanguage,
+  onLanguageChange,
+}: LanguageSwitchProps) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<Language>({
     name: "ENG",
@@ -20,14 +30,30 @@ const LanguageSwitch = () => {
     code: "en",
   });
 
-  const languages = [
-    { name: "ENG", image: ImageEng, code: "en" },
-    { name: "VIE", image: ImageVie, code: "vi" },
-  ];
+  const languages = useMemo(
+    () => [
+      { name: "ENG", image: ImageEng, code: "en" },
+      { name: "VIE", image: ImageVie, code: "vi" },
+    ],
+    []
+  );
 
-  const handleLanguageSelect = (language: Language) => {
+  useEffect(() => {
+    const matched = languages.find((lang) => lang.code === currentLanguage);
+    if (matched) {
+      setSelectedLanguage(matched);
+    }
+  }, [currentLanguage, languages]);
+
+  const handleLanguageSelect = async (language: Language) => {
     setSelectedLanguage(language);
-    i18n.changeLanguage(language.code);
+    onLanguageChange(language.code);
+    try {
+      const data: UpdateLanguage = { language: language.code };
+      await updateLanguage(settingId, data);
+    } catch (error) {
+      console.log("Error update language", error);
+    }
     setDropdownOpen(false);
   };
 
