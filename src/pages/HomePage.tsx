@@ -21,11 +21,14 @@ import { setPerformances, updateVote } from "../store/slices/performanceSlice";
 import { logout, selectIsAuthenticated } from "../store/slices/userSlice";
 import { Settings } from "../types/Settings";
 import { getDeviceId } from "../utils/voteUtils";
+import LanguageSwitch from "../components/LanguageSwitch/LanguageSwitch";
+import { useTranslation } from "react-i18next";
 
 // Danh sách màu sắc khác nhau cho từng performance
 // const colors = ["#ff4d4f", "#40a9ff", "#36cfc9", "#ffec3d", "#9254de"];
 const colors = ["#7A00E6"];
 
+// kiem tra man hinh dang mobile
 const checkIfMobile = () => {
   return window.innerWidth <= 768;
 };
@@ -33,6 +36,7 @@ const checkIfMobile = () => {
 const HomePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const performances = useSelector(
     (state: any) => state.performance.performances
   );
@@ -65,6 +69,7 @@ const HomePage = () => {
     };
   }, [settingsData]);
 
+  // Lấy danh sách các hang mục
   const fetchCategories = useCallback(async () => {
     try {
       const res = await getCategories();
@@ -76,6 +81,7 @@ const HomePage = () => {
     }
   }, [dispatch]);
 
+  // Lay background image
   const fetchSettings = useCallback(async () => {
     try {
       const res = await getSettings();
@@ -97,6 +103,7 @@ const HomePage = () => {
       : false
   );
 
+  // Lay danh sach cac performance theo categoryId
   const fetchPerformances = useCallback(async () => {
     if (categoryId === null) return;
     try {
@@ -120,7 +127,7 @@ const HomePage = () => {
   }, [categoryId, fetchPerformances]);
 
   useEffect(() => {
-    const deviceId = getDeviceId(); // bạn đã gọi ở trên đầu rồi
+    const deviceId = getDeviceId();
     if (categoryId) {
       socket.emit("register", { deviceId, categoryId });
     }
@@ -181,13 +188,6 @@ const HomePage = () => {
     }
   };
 
-  // useEffect(() => {
-  //   document.body.style.overflow = "hidden";
-  //   return () => {
-  //     document.body.style.overflow = "auto";
-  //   };
-  // }, []);
-
   return (
     <div
       style={{
@@ -208,7 +208,7 @@ const HomePage = () => {
             color: settingsData?.textColor,
           }}
         >
-          Kết Quả Bình Chọn
+          {t("HomePage.votingResult")}
         </h1>
         <div
           style={{
@@ -218,7 +218,7 @@ const HomePage = () => {
           }}
         >
           {isAuthenticated ? (
-            <div>
+            <div style={{ display: "flex", alignItems: "center" }}>
               <Button
                 type="primary"
                 onClick={handleVotePermission}
@@ -228,7 +228,9 @@ const HomePage = () => {
                   backgroundColor: "#1890ff",
                 }}
               >
-                {isVotingEnabled ? "Dừng Bình Chọn" : "Mở Bình Chọn"}
+                {isVotingEnabled
+                  ? t("HomePage.stopVoting")
+                  : t("HomePage.startVoting")}
               </Button>
               <Button
                 type="primary"
@@ -239,7 +241,7 @@ const HomePage = () => {
                   backgroundColor: "#52c41a",
                 }}
               >
-                Cài Đặt
+                {t("HomePage.config")}
               </Button>
               <Button
                 type="primary"
@@ -247,8 +249,9 @@ const HomePage = () => {
                 onClick={handleLogout}
                 className={styles.buttonCustom}
               >
-                Đăng Xuất
+                {t("HomePage.logout")}
               </Button>
+              <LanguageSwitch />
             </div>
           ) : (
             <Button
@@ -256,7 +259,7 @@ const HomePage = () => {
               onClick={() => navigate("/login")}
               className={`${styles.buttonCustom} ${styles.loginButton}`}
             >
-              Login
+              {t("HomePage.login")}
             </Button>
           )}
         </div>
@@ -356,6 +359,7 @@ const HomePage = () => {
                   />
                 </div>
               </div>
+              {/* Nếu là máy tính */}
               {!checkIfMobile() && (
                 <div
                   style={{
@@ -366,9 +370,12 @@ const HomePage = () => {
                     zIndex: 1,
                   }}
                 >
-                  {`${Math.round(percentage)}% (${performance.vote} phiếu)`}
+                  {`${Math.round(percentage)}% (${performance.vote} ${t(
+                    "HomePage.vote"
+                  )})`}
                 </div>
               )}
+              {/* Nếu là điện thoại */}
               {checkIfMobile() && (
                 <span
                   style={{
@@ -379,7 +386,9 @@ const HomePage = () => {
                     zIndex: 1,
                   }}
                 >
-                  {`${Math.round(percentage)}% (${performance.vote} phiếu)`}
+                  {`${Math.round(percentage)}% (${performance.vote} ${t(
+                    "HomePage.vote"
+                  )})`}
                 </span>
               )}
             </div>
@@ -421,14 +430,14 @@ const HomePage = () => {
       >
         {!isVotingEnabled && (
           <Alert
-            message={<b>Bình chọn đang được tắt!</b>}
+            message={<b>{t("HomePage.currentOff")}</b>}
             type="info"
             showIcon
           />
         )}
         {!selectedId && isVotingEnabled && (
           <Alert
-            message={<b>Chọn một tiết mục để bình chọn</b>}
+            message={<b>{t("HomePage.oneToVote")}</b>}
             type="info"
             showIcon
           />

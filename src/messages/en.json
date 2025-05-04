@@ -1,0 +1,13 @@
+{
+  "HomePage": {
+    "votingResult": "Voting Result",
+    "config": "Config",
+    "stopVoting": "Stop Voting",
+    "startVoting": "Start Voting",
+    "logout": "Logout",
+    "login": "Login",
+    "currentOff": "Voting is currently off",
+    "oneToVote": "Choose one performance to vote",
+    "vote": "Vote"
+  }
+}

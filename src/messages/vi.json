@@ -1,0 +1,13 @@
+{
+  "HomePage": {
+    "votingResult": "Kết quả bình chọn",
+    "config": "Cài đặt",
+    "stopVoting": "Dừng bình chọn",
+    "startVoting": "Mở bình chọn",
+    "logout": "Đăng xuất",
+    "login": "Đăng nhập",
+    "currentOff": "Bình chọn đang được tắt",
+    "oneToVote": "Chọn một tiết mục để bình chọn",
+    "vote": "Phiếu"
+  }
+}
