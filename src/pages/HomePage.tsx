@@ -26,7 +26,8 @@ import { useTranslation } from "react-i18next";
 
 // Danh sách màu sắc khác nhau cho từng performance
 // const colors = ["#ff4d4f", "#40a9ff", "#36cfc9", "#ffec3d", "#9254de"];
-const colors = ["#7A00E6"];
+const colors = ["#f27405"];
+const textColor = ["#fff"];
 
 // kiem tra man hinh dang mobile
 const checkIfMobile = () => {
@@ -309,7 +310,7 @@ const HomePage = () => {
                     width: "100px",
                     fontWeight: "bold",
                     fontSize: "1.3rem",
-                    color: colors[index % colors.length],
+                    color: textColor[index % textColor.length],
                     textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
                     marginLeft: "3%",
                     marginBottom: "3px",
@@ -343,7 +344,7 @@ const HomePage = () => {
                       width: "100px",
                       fontWeight: "bold",
                       fontSize: "1.3rem",
-                      color: colors[index % colors.length],
+                      color: textColor[index % textColor.length],
                       textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
                       marginLeft: "3%",
                     }}
@@ -376,7 +377,7 @@ const HomePage = () => {
               {!checkIfMobile() && (
                 <div
                   style={{
-                    color: colors[index % colors.length],
+                    color: textColor[index % textColor.length],
                     fontSize: checkIfMobile() ? "1rem" : "1.3rem",
                     fontWeight: "bold",
                     textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
@@ -392,7 +393,7 @@ const HomePage = () => {
               {checkIfMobile() && (
                 <span
                   style={{
-                    color: colors[index % colors.length],
+                    color: textColor[index % textColor.length],
                     fontSize: checkIfMobile() ? "1rem" : "1.3rem",
                     fontWeight: "bold",
                     textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
