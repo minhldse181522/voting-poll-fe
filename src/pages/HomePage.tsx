@@ -161,7 +161,7 @@ const HomePage = () => {
     return () => {
       socket.off("vote-success");
       socket.off("vote-denied");
-      socket.off("vote-updated");
+      socket.off("voteUpdate");
       socket.off("votingStateChanged");
       socket.off("languageUpdate");
     };
@@ -286,59 +286,32 @@ const HomePage = () => {
           margin: "0 auto",
         }}
       >
-        {performances.map((performance: any, index: number) => {
-          const totalVotes = performances.reduce(
-            (acc: number, p: any) => acc + p.vote,
-            0
-          );
-          const percentage =
-            totalVotes > 0 ? (performance.vote / totalVotes) * 100 : 0;
+        {[...performances]
+          .sort((a, b) => b.vote - a.vote)
+          .map((performance: any, index: number) => {
+            const totalVotes = performances.reduce(
+              (acc: number, p: any) => acc + p.vote,
+              0
+            );
+            const percentage = Math.max(
+              0,
+              Math.min(
+                100,
+                totalVotes > 0 ? (performance.vote / totalVotes) * 100 : 0
+              )
+            );
 
-          return (
-            <div
-              key={performance.id}
-              style={{
-                marginBottom: checkIfMobile() ? "8%" : "4%",
-                cursor: "pointer",
-              }}
-              onClick={() => handleSelect(performance.id)}
-            >
-              {/* mobile performance title*/}
-              {checkIfMobile() && (
-                <div
-                  style={{
-                    width: "100px",
-                    fontWeight: "bold",
-                    fontSize: "1.3rem",
-                    color: textColor[index % textColor.length],
-                    textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
-                    marginLeft: "3%",
-                    marginBottom: "3px",
-                  }}
-                >
-                  {performance.name}
-                </div>
-              )}
-              {/* progress bar */}
+            return (
               <div
+                key={performance.id}
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: "8px",
-                  border:
-                    selectedId === performance.id
-                      ? "5px solid #1890ff"
-                      : "1px solid rgba(255, 255, 255, 0.3)",
-                  borderRadius: 30,
-                  // backgroundColor: "white",
-                  background: "rgba(255, 255, 255, 0.1)",
-                  boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-                  backdropFilter: "blur(10px)",
-                  WebkitBackdropFilter: "blur(10px)", // Safari support
-                  padding: 10,
+                  marginBottom: checkIfMobile() ? "8%" : "4%",
+                  cursor: "pointer",
                 }}
+                onClick={() => handleSelect(performance.id)}
               >
-                {!checkIfMobile() && (
+                {/* mobile performance title*/}
+                {checkIfMobile() && (
                   <div
                     style={{
                       width: "100px",
@@ -347,67 +320,103 @@ const HomePage = () => {
                       color: textColor[index % textColor.length],
                       textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
                       marginLeft: "3%",
+                      marginBottom: "3px",
                     }}
                   >
                     {performance.name}
                   </div>
                 )}
+                {/* progress bar */}
                 <div
                   style={{
-                    flex: 1,
-                    height: "30px",
-                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: "8px",
+                    border:
+                      selectedId === performance.id
+                        ? "5px solid #1890ff"
+                        : "1px solid rgba(255, 255, 255, 0.3)",
+                    borderRadius: 30,
+                    // backgroundColor: "white",
+                    background: "rgba(255, 255, 255, 0.1)",
+                    boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+                    backdropFilter: "blur(10px)",
+                    WebkitBackdropFilter: "blur(10px)", // Safari support
+                    padding: 10,
                   }}
                 >
+                  {!checkIfMobile() && (
+                    <div
+                      style={{
+                        width: "100px",
+                        fontWeight: "bold",
+                        fontSize: "1.3rem",
+                        color: textColor[index % textColor.length],
+                        textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
+                        marginLeft: "3%",
+                      }}
+                    >
+                      {performance.name}
+                    </div>
+                  )}
                   <div
                     style={{
-                      position: "absolute",
-                      left: 0,
-                      top: 0,
-                      height: "100%",
-                      width: `${percentage}%`,
-                      backgroundColor: colors[index % colors.length],
-                      borderRadius: "4px",
-                      transition: "width 0.3s ease",
+                      flex: 1,
+                      height: "30px",
+                      position: "relative",
                     }}
-                  />
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        top: 0,
+                        height: "100%",
+                        width: `${percentage}%`,
+                        backgroundColor: colors[index % colors.length],
+                        borderRadius: "4px",
+                        transition: "all 0.5s ease-in-out",
+                      }}
+                    />
+                  </div>
                 </div>
+                {/* Nếu là máy tính */}
+                {!checkIfMobile() && (
+                  <div
+                    style={{
+                      color: textColor[index % textColor.length],
+                      fontSize: checkIfMobile() ? "1rem" : "1.3rem",
+                      fontWeight: "bold",
+                      textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
+                      zIndex: 1,
+                      transition: "all 0.5s ease-in-out",
+                    }}
+                  >
+                    {`${Math.round(percentage)}% (${performance.vote} ${t(
+                      "HomePage.vote"
+                    )})`}
+                  </div>
+                )}
+                {/* Nếu là điện thoại */}
+                {checkIfMobile() && (
+                  <span
+                    style={{
+                      color: textColor[index % textColor.length],
+                      fontSize: checkIfMobile() ? "1rem" : "1.3rem",
+                      fontWeight: "bold",
+                      textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
+                      zIndex: 1,
+                      transition: "all 0.5s ease-in-out",
+                    }}
+                  >
+                    {`${Math.round(percentage)}% (${performance.vote} ${t(
+                      "HomePage.vote"
+                    )})`}
+                  </span>
+                )}
               </div>
-              {/* Nếu là máy tính */}
-              {!checkIfMobile() && (
-                <div
-                  style={{
-                    color: textColor[index % textColor.length],
-                    fontSize: checkIfMobile() ? "1rem" : "1.3rem",
-                    fontWeight: "bold",
-                    textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
-                    zIndex: 1,
-                  }}
-                >
-                  {`${Math.round(percentage)}% (${performance.vote} ${t(
-                    "HomePage.vote"
-                  )})`}
-                </div>
-              )}
-              {/* Nếu là điện thoại */}
-              {checkIfMobile() && (
-                <span
-                  style={{
-                    color: textColor[index % textColor.length],
-                    fontSize: checkIfMobile() ? "1rem" : "1.3rem",
-                    fontWeight: "bold",
-                    textShadow: "1px 1px 2px rgba(0,0,0, 0.7)",
-                    zIndex: 1,
-                  }}
-                >
-                  {`${Math.round(percentage)}% (${performance.vote} ${t(
-                    "HomePage.vote"
-                  )})`}
-                </span>
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
 
       {/* Categories section */}
